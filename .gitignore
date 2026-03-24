@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+setup-db.mjs
+.claude/
