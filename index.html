@@ -1517,13 +1517,17 @@ async function sbGet(table, query = '') {
     return res.json();
 }
 
-async function sbUpsert(table, data) {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+async function sbUpsert(table, data, onConflict = 'user_name,date') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
         method: 'POST',
         headers: { ...SB_HEADERS, 'Prefer': 'return=representation,resolution=merge-duplicates' },
         body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error(`Supabase UPSERT error: ${res.status}`);
+    if (!res.ok) {
+        const err = await res.text();
+        console.error('Supabase UPSERT error:', res.status, err);
+        throw new Error(`Supabase UPSERT error: ${res.status}`);
+    }
     return res.json();
 }
 
